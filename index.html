@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CyberChef Cryptographic Puzzle Lab - NU CPE & IIE</title>
+  <link rel="stylesheet" href="styles.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+  <!-- Google Sign-In Client Library -->
+  <script src="https://accounts.google.com/gsi/client" async defer></script>
+</head>
+<body>
+  <!-- Scanline CRT overlays -->
+  <div class="scanlines"></div>
+  <div class="flicker-overlay"></div>
+
+  <!-- HEADER BAR -->
+  <header class="main-header">
+    <div class="header-brand">
+      <span class="header-logo">🔑</span>
+      <div>
+        <h1 class="header-title">CYBERCHEF CRYPTO LAB</h1>
+        <p class="header-subtitle">Naresuan University | CPE & IIE Joint Program</p>
+      </div>
+    </div>
+    <div class="header-controls">
+      <button id="scanline-toggle-btn" class="btn btn-secondary btn-sm">CRT SCREEN: ON</button>
+      <button id="oauth-settings-btn" class="btn btn-icon" title="Configure Google OAuth">⚙️</button>
+      <div id="user-badge-container" class="user-badge is-hidden">
+        <span id="player-badge">🔒</span>
+        <span id="player-display-name">GUEST</span>
+      </div>
+    </div>
+  </header>
+
+  <main class="main-container">
+    
+    <!-- SCREEN 1: START/LOGIN -->
+    <section id="start-screen" class="screen active">
+      <div class="welcome-box">
+        <div class="welcome-badge">MODULE 02 / 03: CRYPTOGRAPHY</div>
+        <h2 class="welcome-title">AUTHENTICATION & ACCESS INITIALIZATION</h2>
+        <p class="welcome-desc">
+          Welcome to the Cryptographic Tooling Lab. You will learn to construct cryptographic recipe pipelines to decode, decrypt, and verify target payloads.
+        </p>
+
+        <form id="login-form" class="auth-form">
+          <!-- Google Sign-In Container -->
+          <div id="google-login-section" class="google-login-section">
+            <p class="oauth-instruction" style="margin-bottom: 12px; font-size: 0.85rem; color: var(--color-text-muted); font-weight: 600; text-align: center;">
+              SECURE UNIVERSITY SIGN-IN REQUIRED (@nu.ac.th)
+            </p>
+            <div id="google-signin-btn" class="google-signin-btn" style="display: flex; justify-content: center;"></div>
+          </div>
+        </form>
+
+        <footer class="welcome-footer">
+          Course: 305331 / 316331 Computer & Information Security
+        </footer>
+      </div>
+    </section>
+
+    <!-- SCREEN 2: GAME WORKSPACE -->
+    <section id="game-screen" class="screen">
+      <div class="game-layout">
+        
+        <!-- Sidebar / Top stats -->
+        <div class="game-hud">
+          <div class="hud-item">
+            <span class="hud-label">LEVEL</span>
+            <span id="level-badge" class="hud-val">01/04</span>
+          </div>
+          <div class="hud-item hud-wide">
+            <span class="hud-label">CURRENT OBJECTIVE</span>
+            <span id="level-name" class="hud-val-text">Loading...</span>
+          </div>
+          <div class="hud-item">
+            <span class="hud-label">SCORE</span>
+            <span id="score-display" class="hud-val text-green">0000</span>
+          </div>
+          <div class="hud-item">
+            <span class="hud-label">TIME</span>
+            <span id="time-display" class="hud-val">00:00</span>
+          </div>
+        </div>
+
+        <div class="scenario-panel">
+          <p id="level-scenario">Loading level details...</p>
+          <div class="scenario-actions">
+            <button id="hint-button" class="btn btn-secondary btn-sm">HINT</button>
+          </div>
+        </div>
+
+        <div id="hint-panel" class="hint-panel is-hidden">
+          <p id="hint-text"></p>
+        </div>
+
+        <!-- Three Panel Workspace Grid -->
+        <div class="workspace-grid">
+          
+          <!-- PANEL 1: OPERATIONS LIST -->
+          <div class="workspace-panel">
+            <h3 class="panel-title">1. OPERATIONS</h3>
+            <div class="panel-desc">Drag operations to the center pipeline.</div>
+            <div id="operations-list" class="operations-container">
+              <!-- Draggable operations will be generated here -->
+            </div>
+          </div>
+
+          <!-- PANEL 2: RECIPE PIPELINE -->
+          <div class="workspace-panel">
+            <h3 class="panel-title">2. RECIPE PIPELINE</h3>
+            <div class="panel-desc">Configure parameters and execution order.</div>
+            <div id="recipe-pipeline" class="pipeline-container">
+              <div class="pipeline-empty-placeholder">Drag operations here to build your recipe...</div>
+            </div>
+          </div>
+
+          <!-- PANEL 3: INPUT / OUTPUT / CONSOLE -->
+          <div class="workspace-panel">
+            <h3 class="panel-title">3. WORKSPACE DATA</h3>
+            <div class="panel-desc">Review output results and logs.</div>
+            
+            <div class="workspace-data-group">
+              <label class="data-label">INPUT PAYLOAD</label>
+              <textarea id="data-input" class="data-textarea text-mono" readonly></textarea>
+            </div>
+
+            <div class="workspace-data-group">
+              <label class="data-label">OUTPUT RESULT</label>
+              <textarea id="data-output" class="data-textarea text-mono text-green" readonly></textarea>
+            </div>
+
+            <div class="workspace-data-group">
+              <label class="data-label">EXECUTION LOGS</label>
+              <div id="execution-logs" class="console-logs text-mono">
+                [SYSTEM] Pipeline idle. Waiting for recipe parameters.
+              </div>
+            </div>
+
+            <div class="workspace-actions">
+              <button id="submit-recipe-btn" class="btn btn-primary btn-block">
+                EXECUTE & VERIFY TARGET [SPACE]
+              </button>
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+    </section>
+
+    <!-- SCREEN 3: RESULTS & CERTIFICATE -->
+    <section id="result-screen" class="screen">
+      <div class="result-box">
+        <div class="result-header">
+          <span class="result-trophy">🏆</span>
+          <h2 class="result-title">LAB COMPLETED</h2>
+          <p class="result-subtitle">Cryptographic Pipeline Validation Successful</p>
+        </div>
+
+        <div class="result-summary">
+          <div class="summary-row">
+            <span>Analyst Name</span>
+            <span id="eval-name" class="summary-val">ALICE</span>
+          </div>
+          <div class="summary-row">
+            <span>Student ID</span>
+            <span id="eval-id" class="summary-val">660601XXXX</span>
+          </div>
+          <div class="summary-row">
+            <span>Security Badge</span>
+            <span id="eval-badge" class="summary-val">👑</span>
+          </div>
+          <div class="summary-row">
+            <span>Assigned Rank</span>
+            <span id="eval-title" class="summary-val text-green">Cryptographic Architect</span>
+          </div>
+          <div class="summary-row">
+            <span>Final Score</span>
+            <span id="eval-score" class="summary-val text-green">0000</span>
+          </div>
+        </div>
+
+        <div class="result-footer-actions">
+          <button id="show-cert-button" class="btn btn-primary">VIEW CERTIFICATE</button>
+          <button id="restart-button" class="btn btn-secondary">PLAY AGAIN</button>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- DIALOG 1: GOOGLE OAUTH CONFIGURATION -->
+  <div id="oauth-settings-modal" class="modal-overlay is-hidden">
+    <div class="modal-box">
+      <h3 class="modal-title">Google OAuth Client ID</h3>
+      <p class="modal-desc">
+        Configure the Google OAuth client ID for student login authentication. This value is persisted in the local browser store.
+      </p>
+      <div class="form-group">
+        <label for="oauth-client-id">OAuth Client ID</label>
+        <input id="oauth-client-id" class="modal-input" type="text" placeholder="e.g. 69112486306-...apps.googleusercontent.com">
+      </div>
+      <div class="modal-actions">
+        <button id="save-oauth-btn" class="btn btn-primary">SAVE CONFIG</button>
+        <button id="clear-oauth-btn" class="btn btn-secondary">CLEAR CONFIG</button>
+        <button id="close-oauth-modal-btn" class="btn btn-outline">CLOSE</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- DIALOG 2: DIGITAL CERTIFICATE -->
+  <div id="cert-modal" class="modal-overlay is-hidden">
+    <div class="cert-modal-box">
+      <button id="close-cert-button" class="cert-close-btn">&times;</button>
+      
+      <!-- Printable Certificate layout -->
+      <div id="certificate" class="certificate-frame">
+        <div class="cert-border-outer">
+          <div class="cert-border-inner">
+            <header class="cert-header">
+              <div class="cert-badge">CPE & IIE</div>
+              <h2 class="cert-main-title">CERTIFICATE OF COMPLETION</h2>
+              <p class="cert-sub-title">Naresuan University | Department of Electrical and Computer Engineering</p>
+            </header>
+            
+            <div class="cert-body">
+              <p class="cert-present">This certificate is proudly presented to</p>
+              <h3 id="cert-recipient-name" class="cert-name">ALICE SMITH</h3>
+              <p id="cert-recipient-id" class="cert-student-id">Student ID: 660601XXXX</p>
+              <p class="cert-achievement">
+                for successfully auditing and engineering cryptographic pipelines in
+              </p>
+              <h4 class="cert-course-title">305331 / 316331 Computer and Information Security</h4>
+              <p class="cert-topic">
+                Topics covered: Base64/Hex encoding pipelines, static XOR key discovery, AES-256-CBC decryption, and SHA-256 file integrity auditing.
+              </p>
+            </div>
+
+            <footer class="cert-footer">
+              <div class="cert-sign-block">
+                <div class="cert-sign-line"></div>
+                <p class="cert-signer">Course Instructor</p>
+                <p class="cert-org">NU Cybersecurity Lab</p>
+              </div>
+              <div class="cert-meta-block">
+                <p class="cert-meta-label">VALIDATION HASH</p>
+                <p id="cert-hash" class="cert-hash-val">SHA256_HASH_VAL_PLACEHOLDER</p>
+                <p class="cert-date-label">DATE VERIFIED</p>
+                <p id="cert-date" class="cert-date-val">2026-07-01</p>
+              </div>
+            </footer>
+          </div>
+        </div>
+      </div>
+
+      <div class="cert-modal-actions">
+        <button id="print-button" class="btn btn-primary">PRINT CERTIFICATE</button>
+        <button id="dismiss-modal-button" class="btn btn-secondary">BACK TO CONSOLE</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="game-core.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
