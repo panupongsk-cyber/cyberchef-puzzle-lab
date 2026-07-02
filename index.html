@@ -62,6 +62,52 @@
       </div>
     </section>
 
+    <!-- SCREEN: Knowledge Brief -->
+    <section id="brief-screen" class="screen">
+      <div class="result-box" style="max-width:900px; margin:0 auto; padding:32px 24px;">
+        <div class="result-header">
+          <span class="result-trophy">📚</span>
+          <h2 class="result-title">CRYPTO LAB BRIEFING</h2>
+          <p class="result-subtitle">Learn these primitives before building your recipe pipelines</p>
+        </div>
+        <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(240px,1fr)); gap:14px; margin: 20px 0 24px;">
+          <div style="background:var(--color-surface,#0d1117); border:1px solid var(--color-border,#30363d); border-left:3px solid #22d3ee; border-radius:8px; padding:16px;">
+            <div style="font-family:monospace; font-size:0.75rem; color:#22d3ee; font-weight:700; margin-bottom:8px;">BASE64</div>
+            <p style="font-size:0.82rem; color:var(--color-text-muted,#8b949e); margin-bottom:6px;">Encoding format — converts binary data to printable ASCII. <strong>Not</strong> encryption.</p>
+            <code style="font-size:0.75rem; color:#86efac;">3 bytes → 4 chars | A-Z, a-z, 0-9, +, /</code>
+          </div>
+          <div style="background:var(--color-surface,#0d1117); border:1px solid var(--color-border,#30363d); border-left:3px solid #a78bfa; border-radius:8px; padding:16px;">
+            <div style="font-family:monospace; font-size:0.75rem; color:#a78bfa; font-weight:700; margin-bottom:8px;">HEX ENCODING</div>
+            <p style="font-size:0.82rem; color:var(--color-text-muted,#8b949e); margin-bottom:6px;">Represents each byte as two hexadecimal digits (0–9, a–f).</p>
+            <code style="font-size:0.75rem; color:#86efac;">0x41 = "A" | 0x4e55 = "NU"</code>
+          </div>
+          <div style="background:var(--color-surface,#0d1117); border:1px solid var(--color-border,#30363d); border-left:3px solid #fb923c; border-radius:8px; padding:16px;">
+            <div style="font-family:monospace; font-size:0.75rem; color:#fb923c; font-weight:700; margin-bottom:8px;">XOR</div>
+            <p style="font-size:0.82rem; color:var(--color-text-muted,#8b949e); margin-bottom:6px;">Symmetric bitwise operation. Applying the key twice restores the original.</p>
+            <code style="font-size:0.75rem; color:#86efac;">Output = Input ⊕ Key | Decrypt: Output ⊕ Key</code>
+          </div>
+          <div style="background:var(--color-surface,#0d1117); border:1px solid var(--color-border,#30363d); border-left:3px solid #f43f5e; border-radius:8px; padding:16px;">
+            <div style="font-family:monospace; font-size:0.75rem; color:#f43f5e; font-weight:700; margin-bottom:8px;">SHA-256</div>
+            <p style="font-size:0.82rem; color:var(--color-text-muted,#8b949e); margin-bottom:6px;">One-way cryptographic hash. Identical input → identical 256-bit output.</p>
+            <code style="font-size:0.75rem; color:#86efac;">Integrity only — cannot be reversed</code>
+          </div>
+          <div style="background:var(--color-surface,#0d1117); border:1px solid var(--color-border,#30363d); border-left:3px solid #10b981; border-radius:8px; padding:16px;">
+            <div style="font-family:monospace; font-size:0.75rem; color:#10b981; font-weight:700; margin-bottom:8px;">AES-256-CBC</div>
+            <p style="font-size:0.82rem; color:var(--color-text-muted,#8b949e); margin-bottom:6px;">Symmetric block cipher. Requires a secret <strong>Key</strong> and <strong>Initialization Vector (IV)</strong>.</p>
+            <code style="font-size:0.75rem; color:#86efac;">Block size: 128 bits | Key size: 256 bits</code>
+          </div>
+          <div style="background:var(--color-surface,#0d1117); border:1px solid var(--color-border,#30363d); border-left:3px solid #fbbf24; border-radius:8px; padding:16px;">
+            <div style="font-family:monospace; font-size:0.75rem; color:#fbbf24; font-weight:700; margin-bottom:8px;">PIPELINE TIPS</div>
+            <p style="font-size:0.82rem; color:var(--color-text-muted,#8b949e); margin-bottom:6px;">Operations execute top-to-bottom. Output of step N becomes input to step N+1.</p>
+            <code style="font-size:0.75rem; color:#86efac;">Drag → Configure params → Execute & Verify</code>
+          </div>
+        </div>
+        <div style="text-align:center;">
+          <button id="start-game-btn" class="btn btn-primary" type="button">LAUNCH CRYPTO LAB ➔</button>
+        </div>
+      </div>
+    </section>
+
     <!-- SCREEN 2: GAME WORKSPACE -->
     <section id="game-screen" class="screen">
       <div class="game-layout">
@@ -264,6 +310,10 @@
     </div>
   </div>
 
+  <!-- Firebase SDK (compat) -->
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
   <script src="game-core.js"></script>
   <script src="app.js"></script>
 </body>

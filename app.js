@@ -1,3 +1,15 @@
+// Firebase initialization (itpe-practice project, gameResults collection)
+const _fbApp = firebase.initializeApp({
+  apiKey: "AIzaSyDOwWZssk7a19R5aYnKpqx2oiSfbNLNLXA",
+  authDomain: "itpe-practice.firebaseapp.com",
+  projectId: "itpe-practice",
+  storageBucket: "itpe-practice.firebasestorage.app",
+  messagingSenderId: "254567748345",
+  appId: "1:254567748345:web:c9e448ccfac9e249584828"
+});
+const _db = firebase.firestore();
+const _auth = firebase.auth();
+
 // State variables
 let state = {
   playerName: "GUEST",
@@ -7,6 +19,7 @@ let state = {
   score: 0,
   timeStart: 0,
   timeElapsed: 0,
+  gameStart: 0,
   timerInterval: null
 };
 
@@ -39,6 +52,7 @@ const OPERATIONS = [
 // DOM references
 const screens = {
   start: document.getElementById("start-screen"),
+  brief: document.getElementById("brief-screen"),
   game: document.getElementById("game-screen"),
   result: document.getElementById("result-screen")
 };
@@ -133,6 +147,9 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
   gameUI.submitRecipeBtn.addEventListener("click", verifyPipeline);
+
+  // Brief screen: enter lab button
+  document.getElementById("start-game-btn").addEventListener("click", initializeGame);
 
   // Result screen actions
   resultUI.restartBtn.addEventListener("click", () => {
@@ -381,8 +398,12 @@ function initializeGoogleGSI() {
           state.studentId = "STAFF/INSTRUCTOR";
         }
 
-        // Auto login
-        initializeGame();
+        // Sign into Firebase with the Google credential (enables Firestore security rules)
+        const fbCredential = firebase.auth.GoogleAuthProvider.credential(response.credential);
+        _auth.signInWithCredential(fbCredential).catch(e => console.warn("Firebase sign-in:", e));
+
+        // Show knowledge brief before starting the game
+        showScreen("brief");
       } catch (e) {
         console.error("JWT credential decode error", e);
         alert("Failed to parse Google sign-in payload.");
@@ -413,7 +434,8 @@ function initializeGame() {
 
   state.currentLevelIdx = 0;
   state.score = 0;
-  
+  state.gameStart = Date.now();
+
   showScreen("game");
   loadLevel();
 }
@@ -489,6 +511,27 @@ function endGame() {
   resultUI.evalBadge.textContent = outcome.badge;
   resultUI.evalTitle.textContent = outcome.title;
   resultUI.evalScore.textContent = state.score.toString().padStart(4, "0");
+
+  saveGameStats();
+}
+
+async function saveGameStats() {
+  if (!state.googleUserEmail) return;
+  const totalSeconds = state.gameStart ? Math.floor((Date.now() - state.gameStart) / 1000) : 0;
+  try {
+    await _db.collection("gameResults").add({
+      gameId: "cyberchef-puzzle-lab",
+      playerName: state.playerName,
+      email: state.googleUserEmail,
+      studentId: state.studentId,
+      score: state.score,
+      levelsCompleted: LEVELS.length,
+      timeTakenSeconds: totalSeconds,
+      completedAt: firebase.firestore.FieldValue.serverTimestamp()
+    });
+  } catch (e) {
+    console.error("Stats save failed:", e);
+  }
 }
 
 // Certificate actions
