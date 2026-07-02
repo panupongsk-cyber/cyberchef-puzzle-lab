@@ -1,11 +1,11 @@
-// Firebase initialization (itpe-practice project, gameResults collection)
+// Firebase initialization (nu-cybersec-games project, gameResults collection)
 const _fbApp = firebase.initializeApp({
-  apiKey: "AIzaSyDOwWZssk7a19R5aYnKpqx2oiSfbNLNLXA",
-  authDomain: "itpe-practice.firebaseapp.com",
-  projectId: "itpe-practice",
-  storageBucket: "itpe-practice.firebasestorage.app",
-  messagingSenderId: "254567748345",
-  appId: "1:254567748345:web:c9e448ccfac9e249584828"
+  apiKey: "AIzaSyBjpwTbjBnKbD5KKxXmw5eRAx5IOoWI9nY",
+  authDomain: "nu-cybersec-games.firebaseapp.com",
+  projectId: "nu-cybersec-games",
+  storageBucket: "nu-cybersec-games.firebasestorage.app",
+  messagingSenderId: "771818733994",
+  appId: "1:771818733994:web:152ea862686c76aa912bd3"
 });
 const _db = firebase.firestore();
 const _auth = firebase.auth();
