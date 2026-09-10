@@ -8,8 +8,6 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&family=Share+Tech+Mono&display=swap" rel="stylesheet">
-  <!-- Google Sign-In Client Library -->
-  <script src="https://accounts.google.com/gsi/client" async defer></script>
 </head>
 <body>
   <!-- Scanline CRT overlays -->
@@ -27,7 +25,6 @@
     </div>
     <div class="header-controls">
       <button id="scanline-toggle-btn" class="btn btn-secondary btn-sm">CRT SCREEN: ON</button>
-      <button id="oauth-settings-btn" class="btn btn-icon" title="Configure Google OAuth">⚙️</button>
       <div id="user-badge-container" class="user-badge is-hidden">
         <span id="player-badge">🔒</span>
         <span id="player-display-name">GUEST</span>
@@ -47,13 +44,15 @@
         </p>
 
         <form id="login-form" class="auth-form">
-          <!-- Google Sign-In Container -->
-          <div id="google-login-section" class="google-login-section">
-            <p class="oauth-instruction" style="margin-bottom: 12px; font-size: 0.85rem; color: var(--color-text-muted); font-weight: 600; text-align: center;">
-              SECURE UNIVERSITY SIGN-IN REQUIRED (@nu.ac.th)
-            </p>
-            <div id="google-signin-btn" class="google-signin-btn" style="display: flex; justify-content: center;"></div>
+          <div class="form-group">
+            <label for="player-name">Full name</label>
+            <input id="player-name" type="text" placeholder="e.g. Somchai Sornsri" required autocomplete="off">
           </div>
+          <div class="form-group">
+            <label for="student-id">Student ID</label>
+            <input id="student-id" type="text" placeholder="e.g. 6601234567" required autocomplete="off">
+          </div>
+          <button type="submit" class="btn btn-primary" style="width: 100%;">ENTER LAB ➔</button>
         </form>
 
         <footer class="welcome-footer">
@@ -239,26 +238,7 @@
 
   </main>
 
-  <!-- DIALOG 1: GOOGLE OAUTH CONFIGURATION -->
-  <div id="oauth-settings-modal" class="modal-overlay is-hidden">
-    <div class="modal-box">
-      <h3 class="modal-title">Google OAuth Client ID</h3>
-      <p class="modal-desc">
-        Configure the Google OAuth client ID for student login authentication. This value is persisted in the local browser store.
-      </p>
-      <div class="form-group">
-        <label for="oauth-client-id">OAuth Client ID</label>
-        <input id="oauth-client-id" class="modal-input" type="text" placeholder="e.g. 69112486306-...apps.googleusercontent.com">
-      </div>
-      <div class="modal-actions">
-        <button id="save-oauth-btn" class="btn btn-primary">SAVE CONFIG</button>
-        <button id="clear-oauth-btn" class="btn btn-secondary">CLEAR CONFIG</button>
-        <button id="close-oauth-modal-btn" class="btn btn-outline">CLOSE</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- DIALOG 2: DIGITAL CERTIFICATE -->
+  <!-- DIALOG: DIGITAL CERTIFICATE -->
   <div id="cert-modal" class="modal-overlay is-hidden">
     <div class="cert-modal-box">
       <button id="close-cert-button" class="cert-close-btn">&times;</button>
@@ -310,10 +290,6 @@
     </div>
   </div>
 
-  <!-- Firebase SDK (compat) -->
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
   <script src="game-core.js"></script>
   <script src="app.js"></script>
 </body>

@@ -1,7 +1,7 @@
 # Instructor Guide: CyberChef Cryptographic Puzzle Lab
 
 ## 1. Pedagogical Design & Course Alignment
-This game is designed to support **Week 2 / Module 02 & 03: Cryptography Foundations** of the **305331 / 316331 Computer and Information Security** syllabus.
+This game is designed to support **Chapter 6 (Symmetric-key Encryption and Key Management) / Module 06: Cryptography Foundations**, delivered in Week 7-8 of the **305331 / 316331 Computer and Information Security** syllabus. *(Corrected 2026-09-09 — this guide previously cited "Module 02 & 03" and pointed to `planning-brief.md`/`weekly-teaching-kit.md`, neither of which exists in `ps-work`; the chapter/module number now matches `textbook/SUMMARY.md` and the `games-portal/index.html` card. See `PS-TASK-20260909-567`.)*
 
 ### Mapped Course Learning Outcomes (CLOs)
 * **CLO 2.1 (Understand Cryptographic Core)**: Distinguish between data representation (encoding) and secure transformations (encryption).
@@ -45,8 +45,8 @@ Instructors can use the reference checklist below to guide students experiencing
 
 ---
 
-## 3. Google Sign-In & Verification
-- Verify that students sign in using their official `@nu.ac.th` accounts.
-- The student's name, Student ID, and Google account email will be locked on the printable certificate.
+## 3. Name/ID Entry & Verification
+- Students enter their name and Student ID at the start screen; this is used only to personalize the
+  on-screen session and printable certificate (kept in the browser, not sent anywhere).
 - Instructors can verify submission authenticity by confirming that the printed **Verification Hash** matches:
-  `Math.abs(hash(playerName_score_studentId_email_date_CYBERCHEF_LAB))`
+  `Math.abs(hash(playerName_score_studentId_date_CYBERCHEF_LAB))`

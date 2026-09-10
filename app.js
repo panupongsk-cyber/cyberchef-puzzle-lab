@@ -1,20 +1,7 @@
-// Firebase initialization (nu-cybersec-games project, gameResults collection)
-const _fbApp = firebase.initializeApp({
-  apiKey: "AIzaSyBjpwTbjBnKbD5KKxXmw5eRAx5IOoWI9nY",
-  authDomain: "nu-cybersec-games.firebaseapp.com",
-  projectId: "nu-cybersec-games",
-  storageBucket: "nu-cybersec-games.firebasestorage.app",
-  messagingSenderId: "771818733994",
-  appId: "1:771818733994:web:152ea862686c76aa912bd3"
-});
-const _db = firebase.firestore();
-const _auth = firebase.auth();
-
 // State variables
 let state = {
   playerName: "GUEST",
   studentId: "N/A",
-  googleUserEmail: null,
   currentLevelIdx: 0,
   score: 0,
   timeStart: 0,
@@ -61,17 +48,6 @@ const topbar = {
   playerDisplayName: document.getElementById("player-display-name"),
   playerBadge: document.getElementById("player-badge"),
   scanlineToggleBtn: document.getElementById("scanline-toggle-btn")
-};
-
-const oauthUI = {
-  btnSettings: document.getElementById("oauth-settings-btn"),
-  modal: document.getElementById("oauth-settings-modal"),
-  closeBtn: document.getElementById("close-oauth-modal-btn"),
-  clientIdInput: document.getElementById("oauth-client-id"),
-  saveBtn: document.getElementById("save-oauth-btn"),
-  clearBtn: document.getElementById("clear-oauth-btn"),
-  loginSection: document.getElementById("google-login-section"),
-  googleBtn: document.getElementById("google-signin-btn")
 };
 
 const gameUI = {
@@ -136,9 +112,14 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 
-  // Login form submit prevention
+  // Login form submit
   document.getElementById("login-form").addEventListener("submit", (e) => {
     e.preventDefault();
+    const nameEl = document.getElementById("player-name");
+    const idEl = document.getElementById("student-id");
+    state.playerName = nameEl.value.trim() || "STUDENT";
+    state.studentId = idEl.value.trim() || "N/A";
+    showScreen("brief");
   });
 
   // Game action listeners
@@ -162,40 +143,11 @@ document.addEventListener("DOMContentLoaded", () => {
   certUI.dismissBtn.addEventListener("click", closeCertificate);
   certUI.printBtn.addEventListener("click", () => window.print());
 
-  // OAuth Settings handlers
-  oauthUI.btnSettings.addEventListener("click", () => {
-    const savedId = localStorage.getItem("google_oauth_client_id") || "";
-    oauthUI.clientIdInput.value = savedId;
-    oauthUI.modal.classList.remove("is-hidden");
-  });
-  oauthUI.closeBtn.addEventListener("click", () => {
-    oauthUI.modal.classList.add("is-hidden");
-  });
-  oauthUI.saveBtn.addEventListener("click", () => {
-    const id = oauthUI.clientIdInput.value.trim();
-    if (id) {
-      localStorage.setItem("google_oauth_client_id", id);
-      oauthUI.modal.classList.add("is-hidden");
-      alert("Google OAuth Client ID saved! Page reloading to apply configuration...");
-      window.location.reload();
-    }
-  });
-  oauthUI.clearBtn.addEventListener("click", () => {
-    localStorage.removeItem("google_oauth_client_id");
-    oauthUI.clientIdInput.value = "";
-    oauthUI.modal.classList.add("is-hidden");
-    alert("Google OAuth Client ID cleared! Page reloading...");
-    window.location.reload();
-  });
-
   // Load drag-and-drop operations templates
   renderOperationsList();
 
   // Drag-and-drop zone setup for Recipe Pipeline
   setupDragAndDropZone();
-
-  // Load Google Identity Services dynamically
-  initializeGoogleGSI();
 });
 
 // Switch screens helper
@@ -372,59 +324,6 @@ async function compilePipeline() {
   gameUI.executionLogs.scrollTop = gameUI.executionLogs.scrollHeight;
 }
 
-// Initialise Google GSI configuration
-function initializeGoogleGSI() {
-  const oauthId = localStorage.getItem("google_oauth_client_id") || "69112486306-t7mofej13egi7ape3t2cgs5l19tg6sp7.apps.googleusercontent.com";
-  if (oauthId && oauthUI.loginSection) {
-    oauthUI.loginSection.classList.remove("is-hidden");
-
-    window.handleGoogleCredentialResponse = (response) => {
-      try {
-        const payload = JSON.parse(atob(response.credential.split(".")[1]));
-        const email = payload.email || "";
-
-        if (!email.toLowerCase().endsWith("@nu.ac.th")) {
-          alert("ACCESS DENIED: Google Sign-In is locked to Naresuan University accounts (@nu.ac.th).");
-          return;
-        }
-
-        state.playerName = payload.name || "STUDENT";
-        state.googleUserEmail = email;
-
-        const studentIdMatch = email.match(/^(\d{10})@/);
-        if (studentIdMatch) {
-          state.studentId = studentIdMatch[1];
-        } else {
-          state.studentId = "STAFF/INSTRUCTOR";
-        }
-
-        // Sign into Firebase with the Google credential (enables Firestore security rules)
-        const fbCredential = firebase.auth.GoogleAuthProvider.credential(response.credential);
-        _auth.signInWithCredential(fbCredential).catch(e => console.warn("Firebase sign-in:", e));
-
-        // Show knowledge brief before starting the game
-        showScreen("brief");
-      } catch (e) {
-        console.error("JWT credential decode error", e);
-        alert("Failed to parse Google sign-in payload.");
-      }
-    };
-
-    setTimeout(() => {
-      if (window.google && window.google.accounts) {
-        window.google.accounts.id.initialize({
-          client_id: oauthId,
-          callback: window.handleGoogleCredentialResponse
-        });
-        window.google.accounts.id.renderButton(
-          oauthUI.googleBtn,
-          { theme: "outline", size: "large", width: 280 }
-        );
-      }
-    }, 800);
-  }
-}
-
 // Game controller logic
 function initializeGame() {
   // Update header HUD display profile
@@ -511,43 +410,19 @@ function endGame() {
   resultUI.evalBadge.textContent = outcome.badge;
   resultUI.evalTitle.textContent = outcome.title;
   resultUI.evalScore.textContent = state.score.toString().padStart(4, "0");
-
-  saveGameStats();
-}
-
-async function saveGameStats() {
-  if (!state.googleUserEmail) return;
-  const totalSeconds = state.gameStart ? Math.floor((Date.now() - state.gameStart) / 1000) : 0;
-  try {
-    await _db.collection("gameResults").add({
-      gameId: "cyberchef-puzzle-lab",
-      playerName: state.playerName,
-      email: state.googleUserEmail,
-      studentId: state.studentId,
-      score: state.score,
-      levelsCompleted: LEVELS.length,
-      timeTakenSeconds: totalSeconds,
-      completedAt: firebase.firestore.FieldValue.serverTimestamp()
-    });
-  } catch (e) {
-    console.error("Stats save failed:", e);
-  }
 }
 
 // Certificate actions
 function openCertificate() {
   certUI.recipientName.textContent = state.playerName.toUpperCase();
-  let idText = state.studentId !== "N/A" && state.studentId.length > 0 ? `Student ID: ${state.studentId}` : "";
-  if (state.googleUserEmail) {
-    idText += ` | Account: ${state.googleUserEmail}`;
-  }
+  const idText = state.studentId !== "N/A" && state.studentId.length > 0 ? `Student ID: ${state.studentId}` : "";
   certUI.recipientId.textContent = idText;
 
   const today = new Date().toISOString().split("T")[0];
   certUI.date.textContent = today;
 
   // Verify hash code compilation
-  const rawHash = `${state.playerName}_${state.score}_${state.studentId}_${state.googleUserEmail || ""}_${today}_CYBERCHEF_LAB`;
+  const rawHash = `${state.playerName}_${state.score}_${state.studentId}_${today}_CYBERCHEF_LAB`;
   let val = 0;
   for (let i = 0; i < rawHash.length; i++) {
     val = (val << 5) - val + rawHash.charCodeAt(i);
