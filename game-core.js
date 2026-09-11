@@ -146,7 +146,7 @@ const LEVELS = [
   {
     id: 1,
     title: "Level 1: Decoding the Transmission",
-    scenario: "A remote grading agent transmitted grades payload encoded to prevent clean text exposure over syslog. Decode the base64 payload to retrieve the validation flag.",
+    scenario: "A remote enrollment-sync agent transmitted a course-identifier payload encoded to prevent clean text exposure over syslog. Decode the base64 payload to retrieve the validation flag.",
     input: "MzA1MzMxX0NvbXB1dGVyX1NlY3VyaXR5X05VX0NQRQ==",
     target: "305331_Computer_Security_NU_CPE",
     hint: "The payload ends with a double '=' padding, characteristic of Base64 encoding. Use 'From Base64'.",
@@ -156,28 +156,37 @@ const LEVELS = [
     id: 2,
     title: "Level 2: XOR Key Compromise",
     scenario: "An attacker obfuscated their command-and-control server address using hex representation and XORed it with a single character static key '0' (hex value 0x30). Decode it.",
-    input: "5e5142554345515e6f455e59465542435944496f534055",
-    target: "naresuan_university_cpe",
+    input: "5546595c1d53021d42555c51491d585f434409",
+    target: "evil-c2-relay-host9",
     hint: "Use 'From Hex' first to convert binary digits back, then apply 'XOR' with key '0x30'.",
     explanation: "Static single-byte XOR obfuscation is extremely weak. Attackers use it to bypass antivirus signature analysis, but it is trivial to crack once the key is known."
   },
   {
     id: 3,
     title: "Level 3: Symmetric Lockout",
-    scenario: "A database backup of transaction logs was encrypted using AES-256-CBC. Decrypt it to read the system status. Key: 'cpe_iie_secret_key', IV: 'iv_init_vector123'.",
+    scenario: "A monitoring service encrypts its database-connection health-check response using AES-256-CBC before logging it. Decrypt the response to confirm the connection status. Key: 'cpe_iie_secret_key', IV: 'iv_init_vector123'.",
     input: "8Cg+JfUPVfz743G4sc43n4nZhsMvQYemQ5pwuGyIPdc=",
     target: "database_decrypted_successfully",
     hint: "Use 'AES Decrypt' and input the parameters: Key = 'cpe_iie_secret_key', IV = 'iv_init_vector123'.",
-    explanation: "AES (Advanced Encryption Standard) in CBC mode is a strong symmetric cipher. Both parties must share the secret key. If the key or IV is altered by even one bit, decryption fails."
+    explanation: "AES (Advanced Encryption Standard) in CBC mode provides strong confidentiality when the key and IV are handled correctly, and both parties must share the secret key. But CBC alone does not verify integrity or authenticity: if an attacker tampered with the ciphertext in transit, CBC decryption can still silently produce different-looking plaintext instead of failing outright. An AEAD mode such as AES-GCM adds an authentication tag specifically to catch that kind of tampering — see Level 5."
   },
   {
     id: 4,
     title: "Level 4: Integrity Signature Audit",
-    scenario: "Calculate the SHA-256 cryptographic signature of the clean plaintext config string: 'allow_root_login=false; port=22;' to submit to the auditor.",
+    scenario: "Before transferring a configuration file to another server, compute its SHA-256 fingerprint so the receiving server can later verify the file arrived unmodified: 'allow_root_login=false; port=22;'.",
     input: "allow_root_login=false; port=22;",
     target: "e02fcf8d548d0a98be7b91419b2195b7d2ba938a155624515e82f95bcf8be2f7",
     hint: "Simply feed the raw input string directly to the 'SHA-256 Hash' operation.",
     explanation: "Cryptographic hashes like SHA-256 verify integrity. If even one space or semicolon in the configuration file changes, the resulting hash will change entirely."
+  },
+  {
+    id: 5,
+    title: "Level 5: Key Rotation Audit",
+    scenario: "The Portal rotates its AES encryption key every semester. Before trusting an old encrypted archive record, you must confirm which key generation produced it. Compute the SHA-256 fingerprint of the key-identifier string below to check it against the retirement log.",
+    input: "portal-aes-key-gen-07",
+    target: "5f6f34e15ff0e534c1e5ed8d9cb9625b4ef8b1deaf8c152cb0256c043faa92ef",
+    hint: "Feed the raw key-identifier string directly to the 'SHA-256 Hash' operation.",
+    explanation: "Key lifecycle management means every encrypted record must stay traceable to the specific key generation that produced it — an encryption key is not meant to be used forever. When a key is rotated or retired, that traceability is what lets a team decide which stored data still depends on it and plan safe re-encryption or decommissioning, instead of discovering the dependency only when something breaks. This also connects back to Level 3: notice that AES-256-CBC decryption there succeeded with no built-in check for tampering. CBC alone provides confidentiality but not authenticity — an AEAD mode like AES-GCM adds an authentication tag that would make a tampered ciphertext fail decryption instead of silently producing different plaintext."
   }
 ];
 

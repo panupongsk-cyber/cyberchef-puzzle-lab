@@ -62,6 +62,13 @@ async function runTests() {
     assert.strictEqual(lvl4Output, lvl4.target);
     console.log("✔ Level 4 solved successfully.");
 
+    // Test 6b: Solve Level 5 (Key Rotation Audit - SHA-256 Hashing)
+    console.log("Test 6b: Solving Level 5...");
+    const lvl5 = LEVELS.find(l => l.id === 5);
+    const lvl5Output = await converters.sha256(lvl5.input);
+    assert.strictEqual(lvl5Output, lvl5.target);
+    console.log("✔ Level 5 solved successfully.");
+
     // Test 7: Score calculation check
     console.log("Test 7: Verifying score bounds...");
     const perfectScore = calculateScore(100, 0, 90);
@@ -76,7 +83,8 @@ async function runTests() {
       { id: 1, correct: true },
       { id: 2, correct: true },
       { id: 3, correct: true },
-      { id: 4, correct: true }
+      { id: 4, correct: true },
+      { id: 5, correct: true }
     ]);
     assert.strictEqual(perfectEval.title, "Cryptographic Architect");
     assert.strictEqual(perfectEval.badge, "👑");
